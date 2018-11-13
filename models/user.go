@@ -1,8 +1,7 @@
 package models
 
 import (
-	"errors"
-
+	"github.com/kenken64/saloon-server/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -17,11 +16,7 @@ type User struct {
 }
 
 func (u *User) HashPassword(plain string) (string, error) {
-	if len(plain) == 0 {
-		return "", errors.New("password should not be empty")
-	}
-	h, err := bcrypt.GenerateFromPassword([]byte(plain), bcrypt.DefaultCost)
-	return string(h), err
+	return utils.hashAndSalt([]byte(plain))
 }
 
 func (u *User) CheckPassword(plain string) bool {

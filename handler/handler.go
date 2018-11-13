@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"../models"
+	"github.com/kenken64/saloon-server/models"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
