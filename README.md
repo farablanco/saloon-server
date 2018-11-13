@@ -31,3 +31,4 @@ INSERT INTO user (firstname, lastname, password, email ) VALUES ("Kenneth", "Pha
 INSERT INTO user (firstname, lastname, password, email ) VALUES ("Kenneth", "Phang", "password@123", "bunnyppl@yahoo.com");
 
 
+An identifier may be exported to permit access to it from another package. An identifier is exported if both:

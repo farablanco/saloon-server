@@ -15,10 +15,10 @@ type User struct {
 }
 
 func (u *User) HashPassword(plain string) (string, error) {
-	return utils.hashAndSalt([]byte(plain))
+	return utils.HashAndSalt([]byte(plain))
 }
 
 func (u *User) CheckPassword(plain string) bool {
-	err := tils.verifyPassword(plain, []byte(u.Password))
+	err := utils.VerifyPassword(plain, []byte(u.Password))
 	return err == nil
 }
