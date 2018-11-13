@@ -1,0 +1,4 @@
+"id";"firstname";"lastname";"password";"email";"isAdmin";"deleted_at";"created_at";"updated_at"
+"1";"Kenneth";"Phang";"password@123";"bunnyppl@hotmail.com";"1";"";"";""
+"2";"Kenneth";"Phang";"password@123";"bunnyppl@gmail.com";"";"";"";""
+"3";"Kenneth";"Phang";"password@123";"bunnyppl@yahoo.com";"";"";"";""

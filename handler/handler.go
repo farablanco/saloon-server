@@ -3,9 +3,13 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
+	"../models"
+
 	"github.com/dgrijalva/jwt-go"
+	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
 	"github.com/labstack/gommon/log"
 )
@@ -18,26 +22,28 @@ func Hello() echo.HandlerFunc {
 	}
 }
 
-func Login() echo.HandlerFunc {
-	log.Debug("Created user")
-
+func Login(db *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		username := c.FormValue("username")
 		password := c.FormValue("password")
-		log.Debug("Created user", username)
-		log.Debug("Created password", password)
-		if username == "test" && password == "test" {
+		fmt.Printf("Login user %s\n", username)
+		fmt.Printf("Login password %s\n", password)
+
+		user := []models.User{}
+		db.Find(&user, "email=? and password=?", username, password)
+
+		if len(user) > 0 && username == user[0].Email {
 			// Create token
 			token := jwt.New(jwt.SigningMethodHS256)
 
 			// Set claims
 			claims := token.Claims.(jwt.MapClaims)
-			claims["name"] = "test"
+			claims["name"] = username
 			claims["admin"] = true
 			claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 			fmt.Printf("%+v\n", claims)
 			// Generate encoded token and send it as response.
-			t, err := token.SignedString([]byte("secret"))
+			t, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 			if err != nil {
 				return err
 			}
@@ -47,6 +53,14 @@ func Login() echo.HandlerFunc {
 		}
 
 		return echo.ErrUnauthorized
+	}
+}
+
+func Register() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		return c.JSON(http.StatusOK, map[string]string{
+			"token": "dfsfd",
+		})
 	}
 }
 
