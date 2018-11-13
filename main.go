@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"./db"
-	"./handler"
 	"github.com/joho/godotenv"
+	"github.com/kenken64/saloon-server/db"
+	"github.com/kenken64/saloon-server/handler"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/labstack/gommon/log"
