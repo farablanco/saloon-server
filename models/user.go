@@ -2,7 +2,6 @@ package models
 
 import (
 	"github.com/kenken64/saloon-server/utils"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -20,6 +19,6 @@ func (u *User) HashPassword(plain string) (string, error) {
 }
 
 func (u *User) CheckPassword(plain string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plain))
+	err := tils.verifyPassword(plain, []byte(u.Password))
 	return err == nil
 }
