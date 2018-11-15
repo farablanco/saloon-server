@@ -8,14 +8,21 @@ go get github.com/labstack/echo
 https://github.com/labstack/echox/tree/master/cookbook/jwt
 https://github.com/dgrijalva/jwt-go
 
+```bash
+curl -X GET  localhost:3000/hello
+```
 
-curl -X POST -d "username=test&password=test" localhost:3000/login -H "Content-Type: application/x-www-form-urlencoded"
+```bash
+curl -X POST -d "username=bunnyppl@gmail.com&password=password@123" localhost:3000/login -H "Content-Type: application/x-www-form-urlencoded"
+```
 
-{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNTQyMzUwMDY1LCJuYW1lIjoidGVzdCJ9.4Qt14esoxlzuR047ARipfwh2P_1n3JYJFTXMC80HjMI"}
+```bash
+curl -X POST localhost:3000/restricted -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNTQyNTI4MTMyLCJuYW1lIjoiYnVubnlwcGxAZ21haWwuY29tIn0.K0NOmo2uEd10iKkhEy16gbPfZVfkT9KPLGVyXf7bkm4"
+```
 
-curl -X POST localhost:3000/restricted -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNTQyMzUwMDY1LCJuYW1lIjoidGVzdCJ9.4Qt14esoxlzuR047ARipfwh2P_1n3JYJFTXMC80HjMI"
-
-Welcome test!
+```
+curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNTQyNTI4MTMyLCJuYW1lIjoiYnVubnlwcGxAZ21haWwuY29tIn0.K0NOmo2uEd10iKkhEy16gbPfZVfkT9KPLGVyXf7bkm4" -X POST -d '{ query: User(id: "1") { id, firstname, lastname }}' http://localhost:3000/restricted
+```
 
 CREATE TABLE IF NOT EXISTS `crm`.`user` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,

@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/kenken64/saloon-server/graphql"
 	"github.com/kenken64/saloon-server/models"
 
 	"github.com/dgrijalva/jwt-go"
@@ -56,19 +58,24 @@ func Login(db *gorm.DB) echo.HandlerFunc {
 	}
 }
 
+/*
 func Register() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{
 			"token": "dfsfd",
 		})
 	}
-}
+}*/
 
 func Restricted() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user := c.Get("user").(*jwt.Token)
-		claims := user.Claims.(jwt.MapClaims)
-		name := claims["name"].(string)
-		return c.String(http.StatusOK, "Welcome "+name+"!")
+		_ = user.Claims.(jwt.MapClaims)
+		bufBody := new(bytes.Buffer)
+		bufBody.ReadFrom(c.Request().Body)
+		query := bufBody.String()
+		log.Printf(query)
+		result := graphql.ExecuteQuery(query)
+		return c.JSON(http.StatusOK, result)
 	}
 }
