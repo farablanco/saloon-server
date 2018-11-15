@@ -5,17 +5,17 @@ import (
 	"log"
 	"strconv"
 
+	"../db"
+	"../models"
 	"github.com/graphql-go/graphql"
-	"github.com/kenken64/saloon-server/db"
-	"github.com/kenken64/saloon-server/models"
 )
 
 var userType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "User",
 		Fields: graphql.Fields{
-			"Id": &graphql.Field{
-				Type: graphql.Int,
+			"id": &graphql.Field{
+				Type: graphql.String,
 			},
 			"firstname": &graphql.Field{
 				Type: graphql.String,
@@ -30,15 +30,15 @@ var userType = graphql.NewObject(
 				Type: graphql.String,
 			},
 			"isAdmin": &graphql.Field{
-				Type: graphql.Int,
-			},
-			"deleted_at": &graphql.Field{
 				Type: graphql.String,
 			},
-			"created_at": &graphql.Field{
+			"deletedAt": &graphql.Field{
 				Type: graphql.String,
 			},
-			"updated_at": &graphql.Field{
+			"createdAt": &graphql.Field{
+				Type: graphql.String,
+			},
+			"updatedAt": &graphql.Field{
 				Type: graphql.String,
 			},
 		},
@@ -58,14 +58,13 @@ var queryType = graphql.NewObject(
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					idQuery, err := strconv.ParseInt(p.Args["id"].(string), 10, 64)
+					db := db.ConnectGORM()
+					db.SingularTable(true)
 					if err == nil {
-						db := db.ConnectGORM()
-						db.SingularTable(true)
 						user := models.User{}
 						user.Id = idQuery
-						db.First(&user)
 						log.Print(idQuery)
-						log.Print(&user)
+						db.First(&user)
 						return &user, nil
 					}
 

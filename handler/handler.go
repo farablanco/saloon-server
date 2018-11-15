@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/kenken64/saloon-server/graphql"
-	"github.com/kenken64/saloon-server/models"
+	"../graphql"
+	"../models"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
@@ -33,7 +33,6 @@ func Login(db *gorm.DB) echo.HandlerFunc {
 
 		user := []models.User{}
 		db.Find(&user, "email=? and password=?", username, password)
-
 		if len(user) > 0 && username == user[0].Email {
 			// Create token
 			token := jwt.New(jwt.SigningMethodHS256)
@@ -58,14 +57,13 @@ func Login(db *gorm.DB) echo.HandlerFunc {
 	}
 }
 
-/*
 func Register() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{
 			"token": "dfsfd",
 		})
 	}
-}*/
+}
 
 func Restricted() echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -73,9 +71,8 @@ func Restricted() echo.HandlerFunc {
 		_ = user.Claims.(jwt.MapClaims)
 		bufBody := new(bytes.Buffer)
 		bufBody.ReadFrom(c.Request().Body)
-		fmt.Printf(bufBody)
 		query := bufBody.String()
-		fmt.Printf(query)
+		log.Printf(query)
 		result := graphql.ExecuteQuery(query)
 		return c.JSON(http.StatusOK, result)
 	}
