@@ -9,6 +9,7 @@ CREATE TABLE `membership_product` (
   `id` int(10) NOT NULL,
   `product_id` int(10) DEFAULT NULL,
   `membership_id` int(10) DEFAULT NULL,
+  `count` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -23,14 +24,15 @@ CREATE TABLE `outlet` (
 
 CREATE TABLE `payment` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
-  `payment_ref_no` int(20) NOT NULL,
+  `payment_ref_no` varchar(200) NOT NULL,
   `total_amount` decimal(18,2) DEFAULT NULL,
   `payment_datetime` datetime DEFAULT NULL,
   `outlet_id` int(10) NOT NULL,
   `discount` decimal(10,0) DEFAULT NULL,
   `payment_mode` int(11) NOT NULL,
+  `user_id` int(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `payment_items` (
   `id` int(10) NOT NULL,
@@ -75,5 +77,14 @@ CREATE TABLE `user` (
   `cut_cnt` int(11) DEFAULT NULL,
   `treatment_cnt` int(11) DEFAULT NULL,
   `hairloss_treatment_cnt` int(11) DEFAULT NULL,
+  `contactNo` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+CREATE TABLE `user_pts` (
+  `id` int(10) NOT NULL,
+  `user_id` int(10) DEFAULT NULL,
+  `pts_id` int(10) DEFAULT NULL,
+  `date_accumulated` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
