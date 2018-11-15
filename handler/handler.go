@@ -73,8 +73,9 @@ func Restricted() echo.HandlerFunc {
 		_ = user.Claims.(jwt.MapClaims)
 		bufBody := new(bytes.Buffer)
 		bufBody.ReadFrom(c.Request().Body)
+		fmt.Printf(bufBody)
 		query := bufBody.String()
-		log.Printf(query)
+		fmt.Printf(query)
 		result := graphql.ExecuteQuery(query)
 		return c.JSON(http.StatusOK, result)
 	}

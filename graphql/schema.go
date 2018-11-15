@@ -53,7 +53,7 @@ var queryType = graphql.NewObject(
 				Type: userType,
 				Args: graphql.FieldConfigArgument{
 					"id": &graphql.ArgumentConfig{
-						Type: graphql.Int,
+						Type: graphql.String,
 					},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -65,6 +65,7 @@ var queryType = graphql.NewObject(
 						user.Id = idQuery
 						db.First(&user)
 						log.Print(idQuery)
+						log.Print(&user)
 						return &user, nil
 					}
 
