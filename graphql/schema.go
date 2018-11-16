@@ -15,7 +15,7 @@ var userType = graphql.NewObject(
 		Name: "User",
 		Fields: graphql.Fields{
 			"id": &graphql.Field{
-				Type: graphql.String,
+				Type: graphql.Int,
 			},
 			"firstname": &graphql.Field{
 				Type: graphql.String,
@@ -39,6 +39,30 @@ var userType = graphql.NewObject(
 				Type: graphql.String,
 			},
 			"updatedAt": &graphql.Field{
+				Type: graphql.String,
+			},
+			"expiry_date": &graphql.Field{
+				Type: graphql.String,
+			},
+			"ptsBalance": &graphql.Field{
+				Type: graphql.String,
+			},
+			"membership": &graphql.Field{
+				Type: graphql.String,
+			},
+			"outlet": &graphql.Field{
+				Type: graphql.String,
+			},
+			"cutCount": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"treatmentCnt": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"hairLossTreatmentCnt": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"contactNo": &graphql.Field{
 				Type: graphql.String,
 			},
 		},
