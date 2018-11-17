@@ -29,3 +29,13 @@ curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6
 ```
 
 An identifier may be exported to permit access to it from another package. An identifier is exported if both:
+
+Graphql
+
+```
+{ 
+  query: User(id: "1") {id, firstname, lastname, email, isAdmin, createdAt, 
+  	updatedAt, contactNo, password, hairloss_treatment_cnt, treatment_cnt, cutCnt, 
+  expiry_date, ptsBalance}
+}
+```

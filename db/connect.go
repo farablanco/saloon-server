@@ -12,11 +12,11 @@ func ConnectGORM() *gorm.DB {
 	USER := os.Getenv("DB_USER")
 	PASS := os.Getenv("DB_PASSWORD")
 	PROTOCOL := os.Getenv("DB_PROTOCOL")
-	DBNAME := os.Getenv("DB_NAME")
+	DBNAME := os.Getenv("DB_DBNAME")
 
-	CONNECT := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME + "?charset=utf8&parseTime=True"
+	CONNECT := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME + "?charset=utf8&parseTime=True&loc=Local"
 	db, err := gorm.Open(DBMS, CONNECT)
-
+	db.LogMode(true)
 	if err != nil {
 		panic(err.Error())
 	}

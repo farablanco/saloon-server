@@ -45,7 +45,7 @@ var userType = graphql.NewObject(
 				Type: graphql.String,
 			},
 			"ptsBalance": &graphql.Field{
-				Type: graphql.String,
+				Type: graphql.Int,
 			},
 			"membership": &graphql.Field{
 				Type: graphql.String,
@@ -53,13 +53,13 @@ var userType = graphql.NewObject(
 			"outlet": &graphql.Field{
 				Type: graphql.String,
 			},
-			"cutCount": &graphql.Field{
+			"cutCnt": &graphql.Field{
 				Type: graphql.Int,
 			},
-			"treatmentCnt": &graphql.Field{
+			"treatment_cnt": &graphql.Field{
 				Type: graphql.Int,
 			},
-			"hairLossTreatmentCnt": &graphql.Field{
+			"hairloss_treatment_cnt": &graphql.Field{
 				Type: graphql.Int,
 			},
 			"contactNo": &graphql.Field{
@@ -89,6 +89,7 @@ var queryType = graphql.NewObject(
 						user.Id = idQuery
 						log.Print(idQuery)
 						db.First(&user)
+						fmt.Printf(">>> %v", user)
 						return &user, nil
 					}
 

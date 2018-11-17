@@ -5,6 +5,7 @@ import (
 
 	"./db"
 	"./handler"
+	"./models"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -31,6 +32,19 @@ func main() {
 	}))
 	db := db.ConnectGORM()
 	db.SingularTable(true)
+
+	user := models.User{}
+	userPts := models.UserPts{}
+	product := models.Product{}
+	points := models.Points{}
+	payment := models.Payment{}
+	paymentItems := models.PaymentItems{}
+	outlet := models.Outlet{}
+	membership := models.Membership{}
+	membershipProduct := models.MembershipProduct{}
+
+	db.AutoMigrate(&user, &userPts,
+		&product, &points, &payment, &paymentItems, &outlet, &membership, &membershipProduct)
 	e.GET("/hello", handler.Hello())
 	e.POST("/login", handler.Login(db))
 	e.POST("/register", handler.Register())

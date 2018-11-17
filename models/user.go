@@ -7,7 +7,10 @@ import (
 )
 
 type User struct {
-	BaseModel
+	Id                     int64      `gorm:"primary_key" db:"id" json:"id"`
+	CreatedAt              time.Time  `gorm:"not null;" db:"created_at" json:"createdAt"`
+	UpdatedAt              time.Time  `gorm:"not null;" db:"updated_at" json:"updatedAt"`
+	DeletedAt              *time.Time `db:"deleted_at" json:"deletedAt"`
 	Firstname              string     `sql:"size:100" db:"firstname" json:"firstName"`
 	Lastname               string     `sql:"size:100" db:"lastname" json:"lastName"`
 	Password               string     `sql:"size:200" db:"password" json:"password"`
@@ -17,9 +20,9 @@ type User struct {
 	ExpiryDate             *time.Time `db:"expiry_date" json:"expiry_date"`
 	Membership             Membership `gorm:"foreignkey:MembershipRefer" db:"membership_id" json:"membership"`
 	Outlet                 Outlet     `gorm:"foreignkey:OutletRefer" db:"outlet_id" json:"outlet"`
-	CutCount               int64      `db:"cut_cnt" json:"cutCount"`
-	TreatmentCount         int64      `db:"treatment_cnt" json:"treatmentCnt"`
-	HairlossTreatmentCount int64      `db:"hairloss_treatment_cnt" json:"hairLossTreatmentCnt"`
+	CutCnt                 int64      `db:"c_cnt" json:"cutCnt"`
+	TreatmentCount         int64      `db:"t_cnt" json:"treatment_cnt"`
+	HairlossTreatmentCount int64      `db:"ht_cnt" json:"hairloss_treatment_cnt"`
 	ContactNo              string     `sql:"size:20" db:"contact_no" json:"contactNo"`
 }
 
