@@ -16,6 +16,9 @@ import (
 	"github.com/labstack/gommon/log"
 )
 
+/**
+ *
+ */
 func Hello() echo.HandlerFunc {
 	log.Debug("Created user")
 	println("bar")
@@ -24,6 +27,9 @@ func Hello() echo.HandlerFunc {
 	}
 }
 
+/**
+ *
+ */
 func Login(db *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		username := c.FormValue("username")
@@ -57,14 +63,31 @@ func Login(db *gorm.DB) echo.HandlerFunc {
 	}
 }
 
-func Register() echo.HandlerFunc {
+/**
+ *
+ */
+func Register(db *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		return c.JSON(http.StatusOK, map[string]string{
-			"token": "dfsfd",
-		})
+
+		username := c.FormValue("username")
+		password := c.FormValue("password")
+		fmt.Printf("Login user %s\n", username)
+		fmt.Printf("Login password %s\n", password)
+
+		user := []models.User{}
+		db.Find(&user, "email=? ", username)
+		if len(user) < 0 {
+			return c.JSON(http.StatusOK, map[string]string{
+				"token": "dfsfd",
+			})
+		}
+		return echo.ErrUnauthorized
 	}
 }
 
+/**
+ *
+ */
 func Restricted() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user := c.Get("user").(*jwt.Token)

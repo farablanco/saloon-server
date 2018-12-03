@@ -47,7 +47,7 @@ func main() {
 		&product, &points, &payment, &paymentItems, &outlet, &membership, &membershipProduct)
 	e.GET("/hello", handler.Hello())
 	e.POST("/login", handler.Login(db))
-	e.POST("/register", handler.Register())
+	e.POST("/register", handler.Register(db))
 
 	r := e.Group("/restricted")
 	r.Use(middleware.JWT([]byte(os.Getenv("JWT_SECRET"))))
