@@ -2,14 +2,14 @@
 
 ```bash
 go get github.com/labstack/echo
- go get github.com/dgrijalva/jwt-go
+go get github.com/dgrijalva/jwt-go
 ```
 
-Using echo middleware framework
+* Using Echo middleware framework
 
 https://github.com/labstack/echox/tree/master/cookbook/jwt
 
-Using jwt go lang libary
+* Using JWT go lang libary
 https://github.com/dgrijalva/jwt-go
 
 ```bash
