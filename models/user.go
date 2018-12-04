@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"time"
 
 	"../utils"
@@ -26,8 +27,13 @@ type User struct {
 	ContactNo              string     `sql:"size:20" db:"contact_no" json:"contactNo"`
 }
 
-func (u *User) HashPassword(plain string) (string, error) {
-	return utils.HashAndSalt([]byte(plain))
+func (u *User) HashPassword(plain string) error {
+	if len(plain) == 0 {
+		return errors.New("password should not be empty!")
+	}
+	passwordHash, _ := utils.HashAndSalt([]byte(plain))
+	u.Password = string(passwordHash)
+	return nil
 }
 
 func (u *User) CheckPassword(plain string) bool {
