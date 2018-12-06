@@ -1,3 +1,4 @@
+// author : Kenneth Phang
 package db
 
 import (
@@ -20,5 +21,6 @@ func ConnectGORM() *gorm.DB {
 	if err != nil {
 		panic(err.Error())
 	}
+
 	return db
 }

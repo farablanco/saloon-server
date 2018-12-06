@@ -1,3 +1,4 @@
+// author : Kenneth Phang
 package main
 
 import (
@@ -32,11 +33,11 @@ func main() {
 	}))
 	db := db.ConnectGORM()
 	db.SingularTable(true)
+	defer db.Close()
 
 	user := models.User{}
 	userPts := models.UserPts{}
 	product := models.Product{}
-	points := models.Points{}
 	payment := models.Payment{}
 	paymentItems := models.PaymentItems{}
 	outlet := models.Outlet{}
@@ -44,7 +45,8 @@ func main() {
 	membershipProduct := models.MembershipProduct{}
 
 	db.AutoMigrate(&user, &userPts,
-		&product, &points, &payment, &paymentItems, &outlet, &membership, &membershipProduct)
+		&product, &payment, &paymentItems, &outlet, &membership, &membershipProduct)
+
 	e.GET("/hello", handler.Hello())
 	e.POST("/login", handler.Login(db))
 	e.POST("/register", handler.Register(db))

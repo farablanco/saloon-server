@@ -1,3 +1,4 @@
+// author : Kenneth Phang
 package models
 
 import (
@@ -19,8 +20,8 @@ type User struct {
 	IsAdmin                bool       `sql:"size:1" db:"isAdmin" json:"isAdmin"`
 	PtsBalance             int64      `db:"pts_balace" json:"ptsBalance"`
 	ExpiryDate             *time.Time `db:"expiry_date" json:"expiry_date"`
-	Membership             Membership `gorm:"foreignkey:MembershipRefer" db:"membership_id" json:"membership"`
-	Outlet                 Outlet     `gorm:"foreignkey:OutletRefer" db:"outlet_id" json:"outlet"`
+	Membership             int64      `db:"membership_id" json:"membership"`
+	Outlet                 int64      `db:"outlet_id" json:"outlet"`
 	CutCnt                 int64      `db:"c_cnt" json:"cutCnt"`
 	TreatmentCount         int64      `db:"t_cnt" json:"treatment_cnt"`
 	HairlossTreatmentCount int64      `db:"ht_cnt" json:"hairloss_treatment_cnt"`
