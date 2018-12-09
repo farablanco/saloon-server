@@ -8,9 +8,9 @@ type Product struct {
 	CreatedAt time.Time  `gorm:"not null;" db:"created_at" json:"createdAt"`
 	UpdatedAt time.Time  `gorm:"not null;" db:"updated_at" json:"updatedAt"`
 	DeletedAt *time.Time `db:"deleted_at" json:"deletedAt"`
-	Name      string     `sql:"size:200" db:"name" json:"name"`
+	Name      string     `gorm:"unique_index;not null" sql:"size:200" db:"name" json:"name"`
 	Price     float32    `sql:"type:decimal(18,2)" db:"price" json:"price"`
 	Pts       int64      `db:"pts" json:"pts"`
 	Remarks   string     `sql:"size:200" db:"remarks" json:"remarks"`
-	Gender    string     `sql:"size:1" db:"gender" json:"gender"`
+	Gender    string     `gorm:"unique_index;not null" sql:"size:1" db:"gender" json:"gender"`
 }

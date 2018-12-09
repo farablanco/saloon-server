@@ -1,4 +1,18 @@
-// author : Kenneth Phang
+// Package graphql schema
+//
+// Copyright 2018 Kenneth Phang <bunnyppl@yahoo.com>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 package graphql
 
 import (
@@ -9,6 +23,7 @@ import (
 
 	"../db"
 	"../models"
+	validator "../utils"
 	"github.com/graphql-go/graphql"
 )
 
@@ -391,6 +406,10 @@ var rootMutation = graphql.NewObject(
 					userPts.CreatedAt = createdAt
 					n3, _ := strconv.ParseInt(allocatedPts, 10, 64)
 					userPts.AllocatedPts = n3
+					if errs := validator.Validate(userPts); errs != nil {
+						// values not valid, deal with errors here
+						return &errs, nil
+					}
 					db.Save(&userPts)
 					return &userPts, nil
 				},
@@ -438,6 +457,10 @@ var rootMutation = graphql.NewObject(
 					product.CreatedAt = createdAt
 					product.Remarks = remarks
 					product.Gender = gender
+					if errs := validator.Validate(product); errs != nil {
+						// values not valid, deal with errors here
+						return &errs, nil
+					}
 					db.Save(&product)
 					return &product, nil
 				},
@@ -496,6 +519,10 @@ var rootMutation = graphql.NewObject(
 					payment.User = n6
 					n7, _ := strconv.ParseFloat(gst, 32)
 					payment.Gst = float32(n7)
+					if errs := validator.Validate(payment); errs != nil {
+						// values not valid, deal with errors here
+						return &errs, nil
+					}
 					db.Save(&payment)
 					return &payment, nil
 				},
@@ -534,13 +561,16 @@ var rootMutation = graphql.NewObject(
 					n5, _ := strconv.ParseInt(productId, 10, 64)
 					paymentItems.CreatedAt = createdAt
 					paymentItems.Product = n5
-
+					if errs := validator.Validate(paymentItems); errs != nil {
+						// values not valid, deal with errors here
+						return &errs, nil
+					}
 					db.Save(&paymentItems)
 					return &paymentItems, nil
 				},
 			},
 
-			// Payment
+			// Outlet
 			"createOutlet": &graphql.Field{
 				Type:        outletType,
 				Description: "Create Outlet",
@@ -560,10 +590,10 @@ var rootMutation = graphql.NewObject(
 					"outletSupervisor": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.String),
 					},
-					"longtitude": &graphql.ArgumentConfig{
+					"latitude": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.String),
 					},
-					"latitude": &graphql.ArgumentConfig{
+					"longtitude": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.String),
 					},
 				},
@@ -591,9 +621,127 @@ var rootMutation = graphql.NewObject(
 					outlet.OutletSupervisor = outletSupervisor
 					outlet.Longtitude = longtitude
 					outlet.Latitude = latitude
-
+					if errs := validator.Validate(outlet); errs != nil {
+						// values not valid, deal with errors here
+						return &errs, nil
+					}
 					db.Save(&outlet)
 					return &outlet, nil
+				},
+			},
+
+			// Membership
+			"createMembership": &graphql.Field{
+				Type:        membershipType,
+				Description: "Create membership",
+				Args: graphql.FieldConfigArgument{
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"ptsGiven": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					name, _ := params.Args["name"].(string)
+					ptsGiven, _ := params.Args["ptsGiven"].(string)
+
+					db := db.ConnectGORM()
+					// Disable table name's pluralization globally
+					db.SingularTable(true)
+
+					createdAt := time.Now()
+					membership := models.Membership{}
+					membership.Name = name
+					n2, _ := strconv.ParseInt(ptsGiven, 10, 64)
+					membership.PtsGiven = n2
+					membership.CreatedAt = createdAt
+					if errs := validator.Validate(membership); errs != nil {
+						// values not valid, deal with errors here
+						return &errs, nil
+					}
+					db.Save(&membership)
+					return &membership, nil
+				},
+			},
+
+			// Membership
+			"createMembershipProduct": &graphql.Field{
+				Type:        membershipProductType,
+				Description: "Create membership product",
+				Args: graphql.FieldConfigArgument{
+					"productId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"membershipId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"count": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					productId, _ := params.Args["productId"].(string)
+					membershipId, _ := params.Args["membershipId"].(string)
+					count, _ := params.Args["count"].(string)
+					db := db.ConnectGORM()
+					// Disable table name's pluralization globally
+					db.SingularTable(true)
+
+					createdAt := time.Now()
+					membershipProduct := models.MembershipProduct{}
+					n3, _ := strconv.ParseInt(productId, 10, 64)
+					membershipProduct.Product = n3
+					n2, _ := strconv.ParseInt(membershipId, 10, 64)
+					membershipProduct.Membership = n2
+					n, _ := strconv.ParseInt(count, 10, 64)
+					membershipProduct.Count = n
+
+					membershipProduct.CreatedAt = createdAt
+					if errs := validator.Validate(membershipProduct); errs != nil {
+						// values not valid, deal with errors here
+						return &errs, nil
+					}
+					db.Save(&membershipProduct)
+					return &membershipProduct, nil
+				},
+			},
+			// update user points
+			"updateUserPts": &graphql.Field{
+				Type:        userPtsType,
+				Description: "Update User Pts",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"userId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"allocatedPts": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"productId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					id, _ := params.Args["id"].(string)
+					userId, _ := params.Args["userId"].(string)
+					allocatedPts, _ := params.Args["allocatedPts"].(string)
+					productId, _ := params.Args["productId"].(string)
+
+					updatedAt := time.Now()
+					userPts := models.UserPts{}
+					db := db.ConnectGORM()
+					// Disable table name's pluralization globally
+					db.SingularTable(true)
+					n, _ := strconv.ParseInt(userId, 10, 64)
+					n2, _ := strconv.ParseInt(productId, 10, 64)
+					n3, _ := strconv.ParseInt(allocatedPts, 10, 64)
+					db.Model(&userPts).Where("id = " + id).UpdateColumns(models.UserPts{UserID: n, AllocatedPts: n3, ProductID: n2, UpdatedAt: updatedAt})
+					n4, _ := strconv.ParseInt(id, 10, 64)
+					userPts.Id = n4
+					return &userPts, nil
 				},
 			},
 		},

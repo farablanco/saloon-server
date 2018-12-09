@@ -25,7 +25,7 @@ type User struct {
 	CutCnt                 int64      `db:"c_cnt" json:"cutCnt"`
 	TreatmentCount         int64      `db:"t_cnt" json:"treatment_cnt"`
 	HairlossTreatmentCount int64      `db:"ht_cnt" json:"hairloss_treatment_cnt"`
-	ContactNo              string     `sql:"size:20" db:"contact_no" json:"contactNo"`
+	ContactNo              string     `gorm:"unique_index;not null" sql:"size:20" db:"contact_no" json:"contactNo"`
 }
 
 func (u *User) HashPassword(plain string) error {

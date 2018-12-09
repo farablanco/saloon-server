@@ -16,15 +16,17 @@ https://github.com/dgrijalva/jwt-go
 curl -X GET  localhost:3000/hello
 ```
 
+
+## Registration end point
+```bash
+curl -X POST -d "username=bunnyppl@gmail.com&password=password1234&contactNo=12345678" localhost:3000/register -H "Content-Type: application/x-www-form-urlencoded"
+```
+
 ## Login end point
 ```bash
 curl -X POST -d "username=bunnyppl@gmail.com&password=password@123" localhost:3000/login -H "Content-Type: application/x-www-form-urlencoded"
 ```
 
-## Registration end point
-```bash
-curl -X POST -d "username=bunnyppl@gmail.com&password=password@123" localhost:3000/register -H "Content-Type: application/x-www-form-urlencoded"
-```
 
 ## Common end point to access the database record
 ```bash

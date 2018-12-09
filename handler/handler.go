@@ -52,7 +52,7 @@ func Login(db *gorm.DB) echo.HandlerFunc {
 			// Set claims
 			claims := token.Claims.(jwt.MapClaims)
 			claims["name"] = username
-			claims["admin"] = true
+			claims["admin"] = user[0].IsAdmin
 			claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 			fmt.Printf("%+v\n", claims)
 			// Generate encoded token and send it as response.
@@ -74,17 +74,18 @@ func Login(db *gorm.DB) echo.HandlerFunc {
  */
 func Register(db *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-
 		username := c.FormValue("username")
 		password := c.FormValue("password")
+		contactNo := c.FormValue("contactNo")
+
 		fmt.Printf("Register user %s\n", username)
 		fmt.Printf("Register password %s\n", password)
-
+		fmt.Printf("Register contactNo %s\n", contactNo)
 		user := []models.User{}
 		db.Find(&user, "email=? ", username)
 		fmt.Printf("Register password %d\n", len(user))
 		if len(user) <= 0 {
-			insertUser := models.User{Email: username, Password: password}
+			insertUser := models.User{Email: username, Password: password, ContactNo: contactNo}
 
 			fmt.Printf("Register password %d\n", len(user))
 			err2 := insertUser.HashPassword(password)
@@ -97,11 +98,11 @@ func Register(db *gorm.DB) echo.HandlerFunc {
 			}
 			// Create token
 			token := jwt.New(jwt.SigningMethodHS256)
-
+			fmt.Printf("isAdmin %d\n", &insertUser.IsAdmin)
 			// Set claims
 			claims := token.Claims.(jwt.MapClaims)
 			claims["name"] = username
-			claims["admin"] = true
+			claims["admin"] = false
 			claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 			fmt.Printf("%+v\n", claims)
 			// Generate encoded token and send it as response.
@@ -123,6 +124,7 @@ func Register(db *gorm.DB) echo.HandlerFunc {
 func Restricted() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user := c.Get("user").(*jwt.Token)
+		log.Printf("%v", user)
 		_ = user.Claims.(jwt.MapClaims)
 		bufBody := new(bytes.Buffer)
 		bufBody.ReadFrom(c.Request().Body)
