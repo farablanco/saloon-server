@@ -37,8 +37,8 @@ curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6
 
 An identifier may be exported to permit access to it from another package. An identifier is exported if both:
 
-Graphql
-
+## Graphql
+### Get user by id
 ```
 { 
   query: User(id: "1") {id, firstname, lastname, email, isAdmin, createdAt, 
@@ -50,5 +50,29 @@ Graphql
   query: User(id: "3") {id, firstname, lastname, email, isAdmin, createdAt, 
   	updatedAt, contactNo, password, hairloss_treatment_cnt, treatment_cnt, cutCnt, 
   expiry_date, ptsBalance}
+}
+```
+
+### Create user's point
+
+```
+mutation {
+  createUserPts(userId: "1", allocatedPts: "11", productId: "3") {
+    userId
+    allocatedPts
+    productId
+  }
+}
+```
+
+### Create product
+
+```
+mutation {
+  createProduct(userId: 1, allocatedPts: 11, productId: 3) {
+    userId
+    allocatedPts
+    productId
+  }
 }
 ```

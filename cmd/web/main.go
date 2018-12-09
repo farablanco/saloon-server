@@ -4,9 +4,9 @@ package main
 import (
 	"os"
 
-	"./db"
-	"./handler"
-	"./models"
+	"../../db"
+	"../../handler"
+	"../../models"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"

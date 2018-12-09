@@ -93,7 +93,7 @@ var userPtsType = graphql.NewObject(
 			"updatedAt": &graphql.Field{
 				Type: graphql.String,
 			},
-			"pts": &graphql.Field{
+			"allocatedPts": &graphql.Field{
 				Type: graphql.Int,
 			},
 		},
@@ -113,38 +113,6 @@ var productType = graphql.NewObject(
 			"price": &graphql.Field{
 				Type: graphql.Float,
 			},
-			"deletedAt": &graphql.Field{
-				Type: graphql.String,
-			},
-			"createdAt": &graphql.Field{
-				Type: graphql.String,
-			},
-			"updatedAt": &graphql.Field{
-				Type: graphql.String,
-			},
-			"status": &graphql.Field{
-				Type: graphql.String,
-			},
-			"remarks": &graphql.Field{
-				Type: graphql.String,
-			},
-			"gender": &graphql.Field{
-				Type: graphql.String,
-			},
-		},
-	},
-)
-
-var pointsType = graphql.NewObject(
-	graphql.ObjectConfig{
-		Name: "Points",
-		Fields: graphql.Fields{
-			"id": &graphql.Field{
-				Type: graphql.Int,
-			},
-			"productId": &graphql.Field{
-				Type: graphql.Int,
-			},
 			"pts": &graphql.Field{
 				Type: graphql.Int,
 			},
@@ -157,37 +125,11 @@ var pointsType = graphql.NewObject(
 			"updatedAt": &graphql.Field{
 				Type: graphql.String,
 			},
-			"price": &graphql.Field{
-				Type: graphql.Float,
-			},
-		},
-	},
-)
-
-var paymentItemsType = graphql.NewObject(
-	graphql.ObjectConfig{
-		Name: "PaymentItems",
-		Fields: graphql.Fields{
-			"id": &graphql.Field{
-				Type: graphql.Int,
-			},
-			"paymentId": &graphql.Field{
-				Type: graphql.Int,
-			},
-			"subTotal": &graphql.Field{
-				Type: graphql.Float,
-			},
-			"deletedAt": &graphql.Field{
+			"remarks": &graphql.Field{
 				Type: graphql.String,
 			},
-			"createdAt": &graphql.Field{
+			"gender": &graphql.Field{
 				Type: graphql.String,
-			},
-			"updatedAt": &graphql.Field{
-				Type: graphql.String,
-			},
-			"productId": &graphql.Field{
-				Type: graphql.Int,
 			},
 		},
 	},
@@ -234,6 +176,35 @@ var paymentType = graphql.NewObject(
 	},
 )
 
+var paymentItemsType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "PaymentItems",
+		Fields: graphql.Fields{
+			"id": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"paymentId": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"subTotal": &graphql.Field{
+				Type: graphql.Float,
+			},
+			"deletedAt": &graphql.Field{
+				Type: graphql.String,
+			},
+			"createdAt": &graphql.Field{
+				Type: graphql.String,
+			},
+			"updatedAt": &graphql.Field{
+				Type: graphql.String,
+			},
+			"productId": &graphql.Field{
+				Type: graphql.Int,
+			},
+		},
+	},
+)
+
 var outletType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "Outlet",
@@ -263,6 +234,12 @@ var outletType = graphql.NewObject(
 				Type: graphql.String,
 			},
 			"outletSupervisor": &graphql.Field{
+				Type: graphql.String,
+			},
+			"longtitude": &graphql.Field{
+				Type: graphql.String,
+			},
+			"latitude": &graphql.Field{
 				Type: graphql.String,
 			},
 		},
@@ -390,7 +367,7 @@ var rootMutation = graphql.NewObject(
 					"userId": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.String),
 					},
-					"pts": &graphql.ArgumentConfig{
+					"allocatedPts": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.String),
 					},
 					"productId": &graphql.ArgumentConfig{
@@ -400,7 +377,7 @@ var rootMutation = graphql.NewObject(
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 					userId, _ := params.Args["userId"].(string)
 					fmt.Printf("<<<< userId: %s", userId)
-					pts, _ := params.Args["pts"].(string)
+					allocatedPts, _ := params.Args["allocatedPts"].(string)
 					productId, _ := params.Args["productId"].(string)
 					db := db.ConnectGORM()
 					db.SingularTable(true)
@@ -412,7 +389,7 @@ var rootMutation = graphql.NewObject(
 					n2, _ := strconv.ParseInt(productId, 10, 64)
 					userPts.ProductID = n2
 					userPts.CreatedAt = createdAt
-					n3, _ := strconv.ParseInt(pts, 10, 64)
+					n3, _ := strconv.ParseInt(allocatedPts, 10, 64)
 					userPts.AllocatedPts = n3
 					db.Save(&userPts)
 					return &userPts, nil
@@ -421,13 +398,118 @@ var rootMutation = graphql.NewObject(
 
 			// Product
 			"createProduct": &graphql.Field{
-				Type:        userPtsType,
-				Description: "Create user points",
+				Type:        productType,
+				Description: "Create Product",
 				Args: graphql.FieldConfigArgument{
-					"userId": &graphql.ArgumentConfig{
+					"name": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.String),
 					},
 					"pts": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"price": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"remarks": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"gender": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					name, _ := params.Args["name"].(string)
+					pts, _ := params.Args["pts"].(string)
+					price, _ := params.Args["price"].(string)
+					remarks, _ := params.Args["remarks"].(string)
+					gender, _ := params.Args["gender"].(string)
+
+					db := db.ConnectGORM()
+					// Disable table name's pluralization globally
+					db.SingularTable(true)
+
+					createdAt := time.Now()
+					product := models.Product{}
+					product.Name = name
+					n2, _ := strconv.ParseInt(pts, 10, 64)
+					product.Pts = n2
+					n, _ := strconv.ParseFloat(price, 32)
+					product.Price = float32(n)
+					product.CreatedAt = createdAt
+					product.Remarks = remarks
+					product.Gender = gender
+					db.Save(&product)
+					return &product, nil
+				},
+			},
+
+			// Payment
+			"createPayment": &graphql.Field{
+				Type:        paymentType,
+				Description: "Create Payment",
+				Args: graphql.FieldConfigArgument{
+					"total": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"outlet": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"discount": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"userId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"paymentMode": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"gst": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					total, _ := params.Args["total"].(string)
+					outlet, _ := params.Args["outlet"].(string)
+					discount, _ := params.Args["discount"].(string)
+					userId, _ := params.Args["userId"].(string)
+					paymentMode, _ := params.Args["paymentMode"].(string)
+					gst, _ := params.Args["gst"].(string)
+
+					db := db.ConnectGORM()
+					// Disable table name's pluralization globally
+					db.SingularTable(true)
+
+					createdAt := time.Now()
+					payment := models.Payment{}
+					n3, _ := strconv.ParseFloat(total, 32)
+					n4 := createdAt.Format("20060102150405")
+					payment.PaymentRefNo = "REF" + n4
+					payment.Total = float32(n3)
+					n2, _ := strconv.ParseInt(outlet, 10, 64)
+					payment.Outlet = n2
+					n, _ := strconv.ParseFloat(discount, 32)
+					payment.Discount = float32(n)
+					n5, _ := strconv.ParseInt(paymentMode, 10, 64)
+					payment.CreatedAt = createdAt
+					payment.PaymentMode = int(n5)
+					n6, _ := strconv.ParseInt(userId, 10, 64)
+					payment.User = n6
+					n7, _ := strconv.ParseFloat(gst, 32)
+					payment.Gst = float32(n7)
+					db.Save(&payment)
+					return &payment, nil
+				},
+			},
+
+			// Payment
+			"createPaymentItem": &graphql.Field{
+				Type:        paymentItemsType,
+				Description: "Create Payment Item",
+				Args: graphql.FieldConfigArgument{
+					"paymentId": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"subTotal": &graphql.ArgumentConfig{
 						Type: graphql.NewNonNull(graphql.String),
 					},
 					"productId": &graphql.ArgumentConfig{
@@ -435,20 +517,83 @@ var rootMutation = graphql.NewObject(
 					},
 				},
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-					userId, _ := params.Args["userId"].(int64)
-					pts, _ := params.Args["pts"].(int64)
-					productId, _ := params.Args["productId"].(int64)
+					paymentId, _ := params.Args["paymentId"].(string)
+					subTotal, _ := params.Args["subTotal"].(string)
+					productId, _ := params.Args["productId"].(string)
+
 					db := db.ConnectGORM()
+					// Disable table name's pluralization globally
 					db.SingularTable(true)
 
 					createdAt := time.Now()
-					userPts := models.UserPts{}
-					userPts.UserID = userId
-					userPts.ProductID = productId
-					userPts.CreatedAt = createdAt
-					userPts.AllocatedPts = pts
-					db.Save(&userPts)
-					return &userPts, nil
+					paymentItems := models.PaymentItems{}
+					n3, _ := strconv.ParseFloat(subTotal, 32)
+					paymentItems.SubTotal = float32(n3)
+					n2, _ := strconv.ParseInt(paymentId, 10, 64)
+					paymentItems.Payment = n2
+					n5, _ := strconv.ParseInt(productId, 10, 64)
+					paymentItems.CreatedAt = createdAt
+					paymentItems.Product = n5
+
+					db.Save(&paymentItems)
+					return &paymentItems, nil
+				},
+			},
+
+			// Payment
+			"createOutlet": &graphql.Field{
+				Type:        outletType,
+				Description: "Create Outlet",
+				Args: graphql.FieldConfigArgument{
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"postalCode": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"contactNo": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"email": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"outletSupervisor": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"longtitude": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"latitude": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					name, _ := params.Args["name"].(string)
+					postalCode, _ := params.Args["postalCode"].(string)
+					contactNo, _ := params.Args["contactNo"].(string)
+					email, _ := params.Args["email"].(string)
+					outletSupervisor, _ := params.Args["outletSupervisor"].(string)
+					longtitude, _ := params.Args["longtitude"].(string)
+					latitude, _ := params.Args["latitude"].(string)
+
+					db := db.ConnectGORM()
+					// Disable table name's pluralization globally
+					db.SingularTable(true)
+
+					createdAt := time.Now()
+					outlet := models.Outlet{}
+					outlet.Name = name
+					n2, _ := strconv.ParseInt(postalCode, 10, 64)
+					outlet.PostalCode = int(n2)
+					outlet.CreatedAt = createdAt
+					outlet.ContactNo = contactNo
+					outlet.Email = email
+					outlet.OutletSupervisor = outletSupervisor
+					outlet.Longtitude = longtitude
+					outlet.Latitude = latitude
+
+					db.Save(&outlet)
+					return &outlet, nil
 				},
 			},
 		},
