@@ -78,3 +78,24 @@ mutation {
   }
 }
 ```
+
+### Get all user' points 
+
+```
+{ 
+  query: UserPtsHistory(dummy: "") {id, userId, productId, allocatedPts}
+}
+```
+
+### Update product
+
+```
+mutation {
+  updateUserPts(id: "12", userId: "3", allocatedPts: "11", productId: "232") {
+    id
+    userId
+    allocatedPts
+    productId
+  }
+}
+```

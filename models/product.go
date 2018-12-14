@@ -12,5 +12,8 @@ type Product struct {
 	Price     float32    `sql:"type:decimal(18,2)" db:"price" json:"price"`
 	Pts       int64      `db:"pts" json:"pts"`
 	Remarks   string     `sql:"size:200" db:"remarks" json:"remarks"`
-	Gender    string     `gorm:"unique_index;not null" sql:"size:1" db:"gender" json:"gender"`
+	Gender    string     `sql:"size:1" db:"gender" json:"gender"`
+	Type      string     `sql:"size:1" db:"type" json:"type"`
+	PhotoURL  string     `db:"photourl" json:"photourl"`
+	PhotoURL2 string     `db:"photourl2" json:"photourl2"`
 }

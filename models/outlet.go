@@ -15,4 +15,5 @@ type Outlet struct {
 	OutletSupervisor string     `sql:"size:100" db:"supervisor" json:"supervisor"`
 	Longtitude       string     `sql:"size:100" db:"longtitude" json:"longtitude"`
 	Latitude         string     `sql:"size:100" db:"latitude" json:"latitude"`
+	Seats            JSON       `sql:"type:json" json:"seats"`
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"../graphql"
@@ -16,17 +17,6 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/gommon/log"
 )
-
-/**
- *
- */
-func Hello() echo.HandlerFunc {
-	log.Debug("Created user")
-	println("bar")
-	return func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello World")
-	}
-}
 
 /**
  *
@@ -69,9 +59,6 @@ func Login(db *gorm.DB) echo.HandlerFunc {
 	}
 }
 
-/**
- *
- */
 func Register(db *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		username := c.FormValue("username")
@@ -87,14 +74,14 @@ func Register(db *gorm.DB) echo.HandlerFunc {
 		if len(user) <= 0 {
 			insertUser := models.User{Email: username, Password: password, ContactNo: contactNo}
 
-			fmt.Printf("Register password %d\n", len(user))
+			fmt.Printf("Register password %v\n", &insertUser)
 			err2 := insertUser.HashPassword(password)
 			if err2 != nil {
 				return err2
 			}
 			err := db.Save(&insertUser).Error
 			if err != nil {
-				return err
+				return echo.ErrUnauthorized
 			}
 			// Create token
 			token := jwt.New(jwt.SigningMethodHS256)
@@ -118,19 +105,24 @@ func Register(db *gorm.DB) echo.HandlerFunc {
 	}
 }
 
-/**
- *
- */
 func Restricted() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user := c.Get("user").(*jwt.Token)
-		log.Printf("%v", user)
-		_ = user.Claims.(jwt.MapClaims)
+		isAdminstr := fmt.Sprint(user.Claims.(jwt.MapClaims)["admin"])
+		userEmail := fmt.Sprint(user.Claims.(jwt.MapClaims)["name"])
+		isAdmin, _ := strconv.ParseBool(isAdminstr)
 		bufBody := new(bytes.Buffer)
+
 		bufBody.ReadFrom(c.Request().Body)
 		query := bufBody.String()
 		log.Printf(query)
-		result := graphql.ExecuteQuery(query)
-		return c.JSON(http.StatusOK, result)
+
+		if isAdmin {
+			result := graphql.ExecuteAdminQuery(query, userEmail)
+			return c.JSON(http.StatusOK, result)
+		} else {
+			result := graphql.ExecuteQuery(query, userEmail)
+			return c.JSON(http.StatusOK, result)
+		}
 	}
 }

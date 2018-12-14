@@ -27,6 +27,8 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
+var emailAddress string = ""
+
 var userType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "User",
@@ -316,6 +318,67 @@ var membershipProductType = graphql.NewObject(
 	},
 )
 
+var bookingType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "Booking",
+		Fields: graphql.Fields{
+			"id": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"hairDresserId": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"bookingDateTime": &graphql.Field{
+				Type: graphql.String,
+			},
+			"outlet": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"customer": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"deletedAt": &graphql.Field{
+				Type: graphql.String,
+			},
+			"createdAt": &graphql.Field{
+				Type: graphql.String,
+			},
+			"updatedAt": &graphql.Field{
+				Type: graphql.String,
+			},
+		},
+	},
+)
+
+var hairDresserType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "Hairdresser",
+		Fields: graphql.Fields{
+			"id": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"name": &graphql.Field{
+				Type: graphql.String,
+			},
+			"yearsOfExp": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"rating": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"deletedAt": &graphql.Field{
+				Type: graphql.String,
+			},
+			"createdAt": &graphql.Field{
+				Type: graphql.String,
+			},
+			"updatedAt": &graphql.Field{
+				Type: graphql.String,
+			},
+		},
+	},
+)
+
 var queryType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "Query",
@@ -343,26 +406,28 @@ var queryType = graphql.NewObject(
 					return nil, nil
 				},
 			},
-			"UserPts": &graphql.Field{
-				Type: userType,
+
+			"UserPtsHistory": &graphql.Field{
+				Type: graphql.NewList(userPtsType),
 				Args: graphql.FieldConfigArgument{
-					"userId": &graphql.ArgumentConfig{
+					"dummy": &graphql.ArgumentConfig{
 						Type: graphql.String,
 					},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					idQuery, err := strconv.ParseInt(p.Args["userId"].(string), 10, 64)
+					email := emailAddress
 					db := db.ConnectGORM()
 					db.SingularTable(true)
+
+					userPts := []models.UserPts{}
+					err := db.Joins("JOIN user on user.id=user_pts.user_id").
+						Where("user.email=?", email).
+						Find(&userPts).Error
 					if err == nil {
-						userPts := models.UserPts{}
-						userPts.UserID = idQuery
-						log.Print(idQuery)
-						db.Find(&userPts)
 						fmt.Printf(">>> %v", userPts)
 						return &userPts, nil
 					}
-
+					log.Fatal(err)
 					return nil, nil
 				},
 			},
@@ -371,6 +436,308 @@ var queryType = graphql.NewObject(
 )
 
 var rootMutation = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "RootMutation",
+		Fields: graphql.Fields{
+
+			// update user profile
+			"updateUserDetails": &graphql.Field{
+				Type:        userType,
+				Description: "Update User Details",
+				Args: graphql.FieldConfigArgument{
+					"contactNo": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"firstname": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"lastname": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+
+					email := emailAddress
+					contactNo, _ := params.Args["contactNo"].(string)
+					firstName, _ := params.Args["firstname"].(string)
+					lastName, _ := params.Args["lastname"].(string)
+
+					updatedAt := time.Now()
+					user := models.User{}
+					db := db.ConnectGORM()
+					// Disable table name's pluralization globally
+					db.SingularTable(true)
+					db.Model(&user).Where("email = ?", email).UpdateColumns(models.User{ContactNo: contactNo, Firstname: firstName, Lastname: lastName, UpdatedAt: updatedAt})
+					return &user, nil
+				},
+			},
+
+			"changePassword": &graphql.Field{
+				Type:        userType,
+				Description: "Change password",
+				Args: graphql.FieldConfigArgument{
+					"password": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					email := emailAddress
+					password, _ := params.Args["password"].(string)
+
+					updatedAt := time.Now()
+					user := models.User{}
+					db := db.ConnectGORM()
+					// Disable table name's pluralization globally
+					db.SingularTable(true)
+					err := user.HashPassword(password)
+					if err != nil {
+						return err, nil
+					}
+					db.Model(&user).Where("email = ?", email).UpdateColumns(models.User{UpdatedAt: updatedAt})
+					return &user, nil
+				},
+			},
+
+			"changePasswordWithChallengePhrase": &graphql.Field{
+				Type:        userType,
+				Description: "Change password with Challenge phrase",
+				Args: graphql.FieldConfigArgument{
+					"resetPasswordToken": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"password": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					email := emailAddress
+					password, _ := params.Args["password"].(string)
+					resetPasswordToken, _ := params.Args["resetPasswordToken"].(string)
+					updatedAt := time.Now()
+					user := models.User{}
+					db := db.ConnectGORM()
+					// Disable table name's pluralization globally
+					db.SingularTable(true)
+					err := user.HashPassword(password)
+					if err != nil {
+						return err, nil
+					}
+					db.Model(&user).Where("reset_password_token = ? AND email = ?", resetPasswordToken, email).UpdateColumns(models.User{UpdatedAt: updatedAt, ResetPasswordDate: &updatedAt})
+					return &user, nil
+				},
+			},
+		},
+	},
+)
+
+var queryAdminType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "Query",
+		Fields: graphql.Fields{
+			"User": &graphql.Field{
+				Type: userType,
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					idQuery, err := strconv.ParseInt(p.Args["id"].(string), 10, 64)
+					db := db.ConnectGORM()
+					db.SingularTable(true)
+					if err == nil {
+						user := models.User{}
+						user.Id = idQuery
+						log.Print(idQuery)
+						db.First(&user)
+						fmt.Printf(">>> %v", user)
+						return &user, nil
+					}
+
+					return nil, nil
+				},
+			},
+
+			"UserPts": &graphql.Field{
+				Type: graphql.NewList(userPtsType),
+				Args: graphql.FieldConfigArgument{
+					"dummy": &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					db := db.ConnectGORM()
+					db.SingularTable(true)
+
+					userPts := []models.UserPts{}
+					err := db.Find(&userPts).Error
+					if err == nil {
+						return &userPts, nil
+					}
+					log.Fatal(err)
+					return nil, nil
+				},
+			},
+
+			"UsersAdmin": &graphql.Field{
+				Type: graphql.NewList(userType),
+				Args: graphql.FieldConfigArgument{
+					"dummy": &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					db := db.ConnectGORM()
+					db.SingularTable(true)
+
+					users := []models.User{}
+					err := db.Find(&users).Error
+					if err == nil {
+						return &users, nil
+					}
+					log.Fatal(err)
+					return nil, nil
+				},
+			},
+
+			"ProductAdmin": &graphql.Field{
+				Type: graphql.NewList(productType),
+				Args: graphql.FieldConfigArgument{
+					"dummy": &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					db := db.ConnectGORM()
+					db.SingularTable(true)
+
+					products := []models.Product{}
+					err := db.Find(&products).Error
+					if err == nil {
+						return &products, nil
+					}
+					log.Fatal(err)
+					return nil, nil
+				},
+			},
+
+			"PaymentAdmin": &graphql.Field{
+				Type: graphql.NewList(paymentType),
+				Args: graphql.FieldConfigArgument{
+					"dummy": &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					db := db.ConnectGORM()
+					db.SingularTable(true)
+
+					payments := []models.Payment{}
+					err := db.Find(&payments).Error
+					if err == nil {
+						return &payments, nil
+					}
+					log.Fatal(err)
+					return nil, nil
+				},
+			},
+
+			"PaymentItemAdmin": &graphql.Field{
+				Type: graphql.NewList(paymentItemsType),
+				Args: graphql.FieldConfigArgument{
+					"paymentId": &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					paymentId, err := strconv.ParseInt(p.Args["paymentId"].(string), 10, 64)
+					if err != nil {
+						return nil, nil
+					}
+					db := db.ConnectGORM()
+					db.SingularTable(true)
+
+					paymentItems := []models.PaymentItems{}
+					err = db.Where("payment_id = ?", paymentId).Find(&paymentItems).Error
+					if err == nil {
+						return &paymentItems, nil
+					}
+					log.Fatal(err)
+					return nil, nil
+				},
+			},
+
+			"OutletAdmin": &graphql.Field{
+				Type: graphql.NewList(outletType),
+				Args: graphql.FieldConfigArgument{
+					"dummy": &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					db := db.ConnectGORM()
+					db.SingularTable(true)
+
+					outlet := []models.Outlet{}
+					err := db.Find(&outlet).Error
+					if err == nil {
+						return &outlet, nil
+					}
+					log.Fatal(err)
+					return nil, nil
+				},
+			},
+
+			"MembershipAdmin": &graphql.Field{
+				Type: graphql.NewList(membershipType),
+				Args: graphql.FieldConfigArgument{
+					"dummy": &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					db := db.ConnectGORM()
+					db.SingularTable(true)
+
+					membership := []models.Membership{}
+					err := db.Find(&membership).Error
+					if err == nil {
+						return &membership, nil
+					}
+					log.Fatal(err)
+					return nil, nil
+				},
+			},
+
+			"MembershipProductAdmin": &graphql.Field{
+				Type: graphql.NewList(membershipProductType),
+				Args: graphql.FieldConfigArgument{
+					"membershipId": &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					membershipId, err := strconv.ParseInt(p.Args["membershipId"].(string), 10, 64)
+					if err != nil {
+						return nil, nil
+					}
+					db := db.ConnectGORM()
+					db.SingularTable(true)
+
+					membershipProduct := []models.MembershipProduct{}
+					err = db.Where("membership_id = ?", membershipId).Find(&membershipProduct).Error
+					if err == nil {
+						return &membershipProduct, nil
+					}
+					log.Fatal(err)
+					return nil, nil
+				},
+			},
+		},
+	},
+)
+
+var rootAdminMutation = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "RootMutation",
 		Fields: graphql.Fields{
@@ -725,11 +1092,11 @@ var rootMutation = graphql.NewObject(
 					},
 				},
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					fmt.Printf("email == %s", emailAddress)
 					id, _ := params.Args["id"].(string)
 					userId, _ := params.Args["userId"].(string)
 					allocatedPts, _ := params.Args["allocatedPts"].(string)
 					productId, _ := params.Args["productId"].(string)
-
 					updatedAt := time.Now()
 					userPts := models.UserPts{}
 					db := db.ConnectGORM()
@@ -748,11 +1115,33 @@ var rootMutation = graphql.NewObject(
 	},
 )
 
-func ExecuteQuery(query string) *graphql.Result {
+func ExecuteQuery(query string, usrEmail string) *graphql.Result {
+	emailAddress = usrEmail
 	var schema, _ = graphql.NewSchema(
 		graphql.SchemaConfig{
 			Query:    queryType,
 			Mutation: rootMutation,
+		},
+	)
+
+	result := graphql.Do(graphql.Params{
+		Schema:        schema,
+		RequestString: query,
+	})
+
+	if len(result.Errors) > 0 {
+		fmt.Printf("wrong result, unexpected errors: %v", result.Errors)
+	}
+
+	return result
+}
+
+func ExecuteAdminQuery(query string, usrEmail string) *graphql.Result {
+	emailAddress = usrEmail
+	var schema, _ = graphql.NewSchema(
+		graphql.SchemaConfig{
+			Query:    queryAdminType,
+			Mutation: rootAdminMutation,
 		},
 	)
 

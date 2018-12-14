@@ -57,11 +57,12 @@ func main() {
 	outlet := models.Outlet{}
 	membership := models.Membership{}
 	membershipProduct := models.MembershipProduct{}
+	booking := models.Booking{}
+	hairdresser := models.Hairdresser{}
 
 	db.AutoMigrate(&user, &userPts,
-		&product, &payment, &paymentItems, &outlet, &membership, &membershipProduct)
+		&product, &payment, &paymentItems, &outlet, &membership, &membershipProduct, &booking, &hairdresser)
 
-	e.GET("/hello", handler.Hello())
 	e.POST("/login", handler.Login(db))
 	e.POST("/register", handler.Register(db))
 
