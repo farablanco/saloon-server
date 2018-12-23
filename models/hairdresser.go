@@ -11,4 +11,6 @@ type Hairdresser struct {
 	Name       string     `gorm:"unique_index;not null" sql:"size:200" db:"name" json:"name"`
 	YearsOfExp int64      `db:"years_of_exp" json:"yearsofEx"`
 	Rating     int64      `db:"rating" json:"rating"`
+	JoinedDate *time.Time `db:"joined_at" json:"joinedAt"`
+	ContactNo  string     `gorm:"unique_index;not null" sql:"size:10" db:"contactNo" json:"contactNo"`
 }

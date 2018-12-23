@@ -45,8 +45,8 @@ func main() {
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
 	}))
-	db := db.ConnectGORM()
-	db.SingularTable(true)
+	db.ConnectGORM()
+	db := db.DBManager()
 	defer db.Close()
 
 	user := models.User{}
@@ -63,10 +63,11 @@ func main() {
 	db.AutoMigrate(&user, &userPts,
 		&product, &payment, &paymentItems, &outlet, &membership, &membershipProduct, &booking, &hairdresser)
 
-	e.POST("/login", handler.Login(db))
-	e.POST("/register", handler.Register(db))
+	API_URI := "/api"
+	e.POST(API_URI+"/login", handler.Login(db))
+	e.POST(API_URI+"/register", handler.Register(db))
 
-	r := e.Group("/restricted")
+	r := e.Group(API_URI + "/restricted")
 	r.Use(middleware.JWT([]byte(os.Getenv("JWT_SECRET"))))
 	r.POST("", handler.Restricted())
 

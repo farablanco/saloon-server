@@ -17,6 +17,7 @@ type User struct {
 	Lastname               string     `sql:"size:100" db:"lastname" json:"lastName"`
 	Password               string     `sql:"size:200" db:"password" json:"password"`
 	Email                  string     `gorm:"unique_index;not null" db:"email" json:"email"`
+	Username               string     `db:"username" json:"username"`
 	IsAdmin                bool       `sql:"size:1" db:"isAdmin" json:"isAdmin"`
 	PtsBalance             int64      `db:"pts_balace" json:"ptsBalance"`
 	ExpiryDate             *time.Time `db:"expiry_date" json:"expiryDate"`
@@ -29,6 +30,8 @@ type User struct {
 	TreatmentCount         int64      `db:"t_cnt" json:"treatment_cnt"`
 	HairlossTreatmentCount int64      `db:"ht_cnt" json:"hairloss_treatment_cnt"`
 	ContactNo              string     `gorm:"unique_index;not null" sql:"size:20" db:"contact_no" json:"contactNo"`
+	Image                  string     `sql:"size:1000" db:"image" json:"image"`
+	Bio                    string     `sql:"size:2000" db:"bio" json:"bio"`
 }
 
 func (u *User) HashPassword(plain string) error {

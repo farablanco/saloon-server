@@ -12,4 +12,5 @@ type Booking struct {
 	BookingDatetime *time.Time `db:"booking_datetime" json:"bookingDatetime"`
 	Outlet          int64      `db:"outlet_id" json:"outletId"`
 	Customer        int64      `db:"customer_id" json:"customerId"`
+	Remarks         string     `sql:"size:1000" db:"remarks" json:"remarks"`
 }

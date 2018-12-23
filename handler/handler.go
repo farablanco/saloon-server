@@ -3,7 +3,9 @@ package handler
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -23,8 +25,20 @@ import (
  */
 func Login(db *gorm.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		username := c.FormValue("username")
-		password := c.FormValue("password")
+		fmt.Printf("Context %v\n", c)
+		fmt.Printf("Context %v\n", c.Request().Body)
+		bufBody := new(bytes.Buffer)
+
+		bufBody.ReadFrom(c.Request().Body)
+		var apolloQuery map[string]interface{}
+		readBuf, _ := ioutil.ReadAll(bufBody)
+		if err := json.Unmarshal(readBuf, &apolloQuery); err != nil { // unmarshall body contents as a type query
+			fmt.Println(err)
+			fmt.Println("Error on Unmarshalling!!!")
+			return echo.ErrUnauthorized
+		}
+		username := apolloQuery["email"].(string)
+		password := apolloQuery["password"].(string)
 		fmt.Printf("Login user %s\n", username)
 		fmt.Printf("Login password %s\n", password)
 
@@ -114,14 +128,27 @@ func Restricted() echo.HandlerFunc {
 		bufBody := new(bytes.Buffer)
 
 		bufBody.ReadFrom(c.Request().Body)
-		query := bufBody.String()
-		log.Printf(query)
+		var apolloQuery map[string]interface{}
+		fmt.Println("Received request body")
+		readBuf, _ := ioutil.ReadAll(bufBody)
+		//bodyContent := bufBody.String()
+		if err := json.Unmarshal(readBuf, &apolloQuery); err != nil { // unmarshall body contents as a type query
+			fmt.Println(err)
+			fmt.Println("Error on Unmarshalling!!!")
+			return echo.ErrUnauthorized
+		}
+		query := apolloQuery["query"]
+		variables := apolloQuery["variables"]
 
+		log.Printf("%v", query)
+		log.Printf("%v", variables)
 		if isAdmin {
-			result := graphql.ExecuteAdminQuery(query, userEmail)
+			fmt.Printf(" ADMIN !")
+			result := graphql.ExecuteAdminQuery(query.(string), userEmail)
 			return c.JSON(http.StatusOK, result)
 		} else {
-			result := graphql.ExecuteQuery(query, userEmail)
+			fmt.Printf(" NON ADMIN !")
+			result := graphql.ExecuteQuery(query.(string), userEmail)
 			return c.JSON(http.StatusOK, result)
 		}
 	}

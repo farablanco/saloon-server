@@ -22,7 +22,14 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func ConnectGORM() *gorm.DB {
+var (
+	db *gorm.DB
+)
+
+func ConnectGORM() {
+	var (
+		err error
+	)
 	DBMS := os.Getenv("DB_DIALET")
 	USER := os.Getenv("DB_USER")
 	PASS := os.Getenv("DB_PASSWORD")
@@ -30,11 +37,21 @@ func ConnectGORM() *gorm.DB {
 	DBNAME := os.Getenv("DB_DBNAME")
 
 	CONNECT := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME + "?charset=utf8&parseTime=True&loc=Local"
-	db, err := gorm.Open(DBMS, CONNECT)
+	db, err = gorm.Open(DBMS, CONNECT)
 	db.LogMode(true)
 	if err != nil {
 		panic(err.Error())
 	}
 
+	if err = db.DB().Ping(); err != nil {
+		panic(err)
+	}
+
+	db.SingularTable(true)
+	db.DB().SetMaxIdleConns(10)
+	db.DB().SetMaxOpenConns(100)
+}
+
+func DBManager() *gorm.DB {
 	return db
 }
