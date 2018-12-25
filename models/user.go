@@ -17,13 +17,13 @@ type User struct {
 	Lastname               string     `sql:"size:100" db:"lastname" json:"lastName"`
 	Password               string     `sql:"size:200" db:"password" json:"password"`
 	Email                  string     `gorm:"unique_index;not null" db:"email" json:"email"`
-	Username               string     `db:"username" json:"username"`
+	Username               string     `gorm:"unique_index;not null" db:"username" json:"username"`
 	IsAdmin                bool       `sql:"size:1" db:"isAdmin" json:"isAdmin"`
 	PtsBalance             int64      `db:"pts_balace" json:"ptsBalance"`
 	ExpiryDate             *time.Time `db:"expiry_date" json:"expiryDate"`
 	ChangePasswordDate     *time.Time `db:"change_password_date" json:"changePasswordDate"`
 	ResetPasswordDate      *time.Time `db:"reset_password_date" json:"resetPasswordDate"`
-	ResetPasswordToken     string     `gorm:"unique_index;" db:"reset_password_token" json:"resetPasswordToken"`
+	ResetPasswordToken     string     `db:"reset_password_token" json:"resetPasswordToken"`
 	Membership             int64      `db:"membership_id" json:"membership"`
 	Outlet                 int64      `db:"outlet_id" json:"outlet"`
 	CutCnt                 int64      `db:"c_cnt" json:"cutCnt"`

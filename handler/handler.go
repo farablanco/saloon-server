@@ -86,12 +86,12 @@ func Register(db *gorm.DB) echo.HandlerFunc {
 		db.Find(&user, "email=? ", username)
 		fmt.Printf("Register password %d\n", len(user))
 		if len(user) <= 0 {
-			insertUser := models.User{Email: username, Password: password, ContactNo: contactNo}
+			insertUser := models.User{Email: username, Username: username, Password: password, ContactNo: contactNo}
 
 			fmt.Printf("Register password %v\n", &insertUser)
 			err2 := insertUser.HashPassword(password)
 			if err2 != nil {
-				return err2
+				return echo.ErrUnauthorized
 			}
 			err := db.Save(&insertUser).Error
 			if err != nil {
@@ -109,7 +109,7 @@ func Register(db *gorm.DB) echo.HandlerFunc {
 			// Generate encoded token and send it as response.
 			t, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 			if err != nil {
-				return err
+				return echo.ErrUnauthorized
 			}
 			return c.JSON(http.StatusOK, map[string]string{
 				"token": t,

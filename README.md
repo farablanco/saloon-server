@@ -19,24 +19,28 @@ curl -X GET  localhost:3000/hello
 
 ## Registration end point
 ```bash
-curl -X POST -d "email=bunnyppl@gmail.com&password=password1234&contactNo=12345678" localhost:3000/register -H "Content-Type: application/x-www-form-urlencoded"
+curl -X POST -d "username=bunnyppl@gmail.com&password=password1234&contactNo=91450518" localhost:3000/api/register -H "Content-Type: application/x-www-form-urlencoded"
+
+curl -X POST -d "username=bunnyppl@hotmail.com&password=password1234&contactNo=91450516" localhost:3000/api/register -H "Content-Type: application/x-www-form-urlencoded"
+
+curl -X POST -d "username=bunnyppl@yahoo.com&password=password1234&contactNo=91450519" localhost:3000/api/register -H "Content-Type: application/x-www-form-urlencoded"
 ```
 
 ## Login end point
 ```bash
-curl -X POST -d "email=bunnyppl@gmail.com&password=password1234" localhost:3000/login -H "Content-Type: application/x-www-form-urlencoded"
+curl -X POST -d "email=bunnyppl@gmail.com&password=password1234" localhost:3000/api/login -H "Content-Type: application/x-www-form-urlencoded"
 
-curl -X POST -d "email=bunnyppl@yahoo.com&password=password1234" localhost:3000/login -H "Content-Type: application/x-www-form-urlencoded"
+curl -X POST -d "email=bunnyppl@yahoo.com&password=password1234" localhost:3000/api/login -H "Content-Type: application/x-www-form-urlencoded"
 ```
 
 
 ## Common end point to access the database record
 ```bash
-curl -X POST localhost:3000/restricted -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNTQyNTI4MTMyLCJuYW1lIjoiYnVubnlwcGxAZ21haWwuY29tIn0.K0NOmo2uEd10iKkhEy16gbPfZVfkT9KPLGVyXf7bkm4"
+curl -X POST localhost:3000/api/restricted -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNTQyNTI4MTMyLCJuYW1lIjoiYnVubnlwcGxAZ21haWwuY29tIn0.K0NOmo2uEd10iKkhEy16gbPfZVfkT9KPLGVyXf7bkm4"
 ```
 
 ```bash
-curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNTQyNTI4MTMyLCJuYW1lIjoiYnVubnlwcGxAZ21haWwuY29tIn0.K0NOmo2uEd10iKkhEy16gbPfZVfkT9KPLGVyXf7bkm4" -X POST -d '{ query: User(id: "1") { id, firstname, lastname }}' http://localhost:3000/restricted
+curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiZXhwIjoxNTQyNTI4MTMyLCJuYW1lIjoiYnVubnlwcGxAZ21haWwuY29tIn0.K0NOmo2uEd10iKkhEy16gbPfZVfkT9KPLGVyXf7bkm4" -X POST -d '{ query: User(id: "1") { id, firstname, lastname }}' http://localhost:3000/api/restricted
 ```
 
 An identifier may be exported to permit access to it from another package. An identifier is exported if both:
