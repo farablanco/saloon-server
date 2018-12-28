@@ -59,9 +59,10 @@ func main() {
 	membershipProduct := models.MembershipProduct{}
 	booking := models.Booking{}
 	hairdresser := models.Hairdresser{}
+	company := models.Company{}
 
 	db.AutoMigrate(&user, &userPts,
-		&product, &payment, &paymentItems, &outlet, &membership, &membershipProduct, &booking, &hairdresser)
+		&product, &payment, &paymentItems, &outlet, &membership, &membershipProduct, &booking, &hairdresser, &company)
 
 	API_URI := "/api"
 	e.POST(API_URI+"/login", handler.Login(db))

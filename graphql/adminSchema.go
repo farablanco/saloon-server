@@ -159,6 +159,26 @@ var queryAdminType = graphql.NewObject(
 				},
 			},
 
+			"CompanyAdmin": &graphql.Field{
+				Type: graphql.NewList(outletType),
+				Args: graphql.FieldConfigArgument{
+					"dummy": &graphql.ArgumentConfig{
+						Type: graphql.String,
+					},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					db := db.DBManager()
+
+					company := []models.Company{}
+					err := db.Find(&company).Error
+					if err == nil {
+						return &company, nil
+					}
+					log.Fatal(err)
+					return nil, nil
+				},
+			},
+
 			"MembershipAdmin": &graphql.Field{
 				Type: graphql.NewList(membershipType),
 				Args: graphql.FieldConfigArgument{
@@ -491,6 +511,53 @@ var rootAdminMutation = graphql.NewObject(
 					}
 					db.Save(&outlet)
 					return &outlet, nil
+				},
+			},
+
+			"createCompany": &graphql.Field{
+				Type:        outletType,
+				Description: "Create Outlet",
+				Args: graphql.FieldConfigArgument{
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"registrationNo": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"contactNo": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"email": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"companyOwner": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					name, _ := params.Args["name"].(string)
+					registrationNo, _ := params.Args["registrationNo"].(string)
+					contactNo, _ := params.Args["contactNo"].(string)
+					email, _ := params.Args["email"].(string)
+					companyOwner, _ := params.Args["companyOwner"].(string)
+
+					db := db.DBManager()
+
+					createdAt := time.Now()
+					company := models.Company{}
+					company.Name = name
+					company.RegistrationCode = registrationNo
+					company.CreatedAt = createdAt
+					company.ContactNo = contactNo
+					company.Email = email
+					company.CompanyOwner = companyOwner
+
+					if errs := validator.Validate(company); errs != nil {
+						// values not valid, deal with errors here
+						return &errs, nil
+					}
+					db.Save(&company)
+					return &company, nil
 				},
 			},
 
@@ -897,6 +964,53 @@ var rootAdminMutation = graphql.NewObject(
 				},
 			},
 
+			// update company
+			"updateCompany": &graphql.Field{
+				Type:        companyType,
+				Description: "Update Company",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"name": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"registrationCode": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"contactNo": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"email": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+					"companyOwner": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					id, _ := params.Args["id"].(string)
+					name, _ := params.Args["name"].(string)
+					registrationCode, _ := params.Args["registrationCode"].(string)
+					contactNo, _ := params.Args["contactNo"].(string)
+					email, _ := params.Args["email"].(string)
+					companyOwner, _ := params.Args["companyOwner"].(string)
+
+					db := db.DBManager()
+
+					updatedAt := time.Now()
+					company := models.Company{}
+					if errs := validator.Validate(company); errs != nil {
+						// values not valid, deal with errors here
+						return &errs, nil
+					}
+					db.Model(&company).Where("id = " + id).UpdateColumns(models.Company{Name: name, RegistrationCode: registrationCode, ContactNo: contactNo, Email: email, CompanyOwner: companyOwner, UpdatedAt: updatedAt})
+					n4, _ := strconv.ParseInt(id, 10, 64)
+					company.Id = n4
+					return &company, nil
+				},
+			},
+
 			// update Membership
 			"updateMembership": &graphql.Field{
 				Type:        membershipType,
@@ -1261,6 +1375,33 @@ var rootAdminMutation = graphql.NewObject(
 					n4, _ := strconv.ParseInt(id, 10, 64)
 					booking.Id = n4
 					return &booking, nil
+				},
+			},
+
+			// delete company
+			"deleteCompany": &graphql.Field{
+				Type:        companyType,
+				Description: "delete company",
+				Args: graphql.FieldConfigArgument{
+					"id": &graphql.ArgumentConfig{
+						Type: graphql.NewNonNull(graphql.String),
+					},
+				},
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					id, _ := params.Args["id"].(string)
+
+					db := db.DBManager()
+
+					company := models.Company{}
+
+					if errs := validator.Validate(company); errs != nil {
+						// values not valid, deal with errors here
+						return &errs, nil
+					}
+					db.Model(&company).Where("id = " + id).Delete(&company)
+					n4, _ := strconv.ParseInt(id, 10, 64)
+					company.Id = n4
+					return &company, nil
 				},
 			},
 		},

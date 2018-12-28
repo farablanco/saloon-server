@@ -247,6 +247,41 @@ var outletType = graphql.NewObject(
 	},
 )
 
+var companyType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "Company",
+		Fields: graphql.Fields{
+			"id": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"name": &graphql.Field{
+				Type: graphql.String,
+			},
+			"registrationCode": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"contactNo": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"deletedAt": &graphql.Field{
+				Type: graphql.String,
+			},
+			"createdAt": &graphql.Field{
+				Type: graphql.String,
+			},
+			"updatedAt": &graphql.Field{
+				Type: graphql.String,
+			},
+			"email": &graphql.Field{
+				Type: graphql.String,
+			},
+			"companyOwner": &graphql.Field{
+				Type: graphql.String,
+			},
+		},
+	},
+)
+
 var membershipType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "Membership",

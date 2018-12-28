@@ -32,6 +32,7 @@ type User struct {
 	ContactNo              string     `gorm:"unique_index;not null" sql:"size:20" db:"contact_no" json:"contactNo"`
 	Image                  string     `sql:"size:1000" db:"image" json:"image"`
 	Bio                    string     `sql:"size:2000" db:"bio" json:"bio"`
+	CompanyID              int64      `db:"company_id" json:"companyId"`
 }
 
 func (u *User) HashPassword(plain string) error {
