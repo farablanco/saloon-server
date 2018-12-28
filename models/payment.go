@@ -8,7 +8,7 @@ import (
 type Payment struct {
 	Id                int64      `gorm:"primary_key" db:"id" json:"id"`
 	CreatedAt         time.Time  `gorm:"not null;" db:"created_at" json:"createdAt"`
-	UpdatedAt         time.Time  `gorm:"not null;" db:"updated_at" json:"updatedAt"`
+	UpdatedAt         time.Time  `db:"updated_at" json:"updatedAt"`
 	DeletedAt         *time.Time `db:"deleted_at" json:"deletedAt"`
 	PaymentRefNo      string     `gorm:"unique_index;not null" sql:"size:10" db:"payment_ref_no" json:"paymentRefNo"`
 	Total             float32    `sql:"type:decimal(18,2);" db:"total" json:"total"`
